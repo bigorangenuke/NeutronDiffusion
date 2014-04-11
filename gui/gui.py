@@ -1,7 +1,6 @@
 from PyQt4 import QtGui,QtCore
 
 import os
-import types
 
 from mplwidget import MplWidget as mpl
 
@@ -41,29 +40,61 @@ class CoreDockWidget(QtGui.QDockWidget):
         if dbg: print('CoreDockWidget.__init__()')
         QtGui.QDockWidget.__init__(self,parent)
         uic.loadUi(path_to('corewidget.ui'),self)
-        
+        self.m = 10.
+        self.n = 10.
+        self.xsize = 10.
+        self.ysize = 10.
         
         self.hookupUI()
-        
+        self.drawCore()
+    
+    def drawCore(self): 
+        if dbg: print('CoreDockWidget.drawCore()')
+        btn = QtGui.QPushButton('woo')
+        layout = self.coreWidget.layout()
+        layout.addWidget(btn)
         
     def hookupUI(self):
         if dbg: print('CoreDockWidget.hookupUI()')
+        self.xSizeLineEdit.editingFinished.connect(self.updateSize)
+        self.ySizeLineEdit.editingFinished.connect(self.updateSize)
+        self.mNodesLineEdit.editingFinished.connect(self.updateSize)
+        self.nNodesLineEdit.editingFinished.connect(self.updateSize)
+        self.updateCorePushButton.clicked.connect(self.updateCore)
+        
+    def updateCore(self):
+        if dbg: print('CoreDockWidget.updateCore()')
+        self.drawCore()
+        
+    def updateSize(self):
+        if dbg: print('CoreDockWidget.updateSize()')
+        self.m = int(self.mNodesLineEdit.text())
+        self.n = int(self.nNodesLineEdit.text())
+        self.xsize = float(self.mNodesLineEdit.text())
+        self.ysize = float(self.ySizeLineEdit.text())
+        
 
 
+def setupMainWindow():
 
-def Launch():
-    mainWindow = MainWindow()
     graphDockWidget = GraphDockWidget()
     mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea,graphDockWidget)
-    mainWindow.show()
-
-if __name__=='__main__':
-    app = QtGui.QApplication([])
-    Launch()
+    coreDockWidget = CoreDockWidget()
+    mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea,coreDockWidget)
     
+    
+    
+if __name__=='__main__':
     import numpy as np
     import matplotlib.pyplot as plt
-    x = np.linspace(0,100,1000)
+    
+    app = QtGui.QApplication([])
+    mainWindow = MainWindow()
+    setupMainWindow()
+    mainWindow.show()
+    
+
+    x = np.linspace(0,7,1000)
     f = np.sin(x)
     plt.plot(x,f)
     app.exec_()

@@ -55,7 +55,7 @@ class MplWidget(QtGui.QWidget):
             nh=event.size().height()
             ow=event.size().width()
             oh=event.size().height()
-            print( self.layout().geometry(),nw,nh,ow,oh)
+            #print( self.layout().geometry(),nw,nh,ow,oh)
             if nw>0 and nh>0:
                 #print nw,nh
                 if nw>nh:
