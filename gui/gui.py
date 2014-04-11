@@ -1,7 +1,7 @@
 from PyQt4 import QtGui,QtCore
 
 import os
-
+import numpy as np
 from mplwidget import MplWidget as mpl
 
 from PyQt4 import uic
@@ -37,22 +37,41 @@ class GraphDockWidget(QtGui.QDockWidget):
 
 class CoreDockWidget(QtGui.QDockWidget):
     def __init__(self,parent=None):
+        
         if dbg: print('CoreDockWidget.__init__()')
+        #Load the core widget
         QtGui.QDockWidget.__init__(self,parent)
         uic.loadUi(path_to('corewidget.ui'),self)
+        
+        #Give some initial values for the size attributes
         self.m = 10.
         self.n = 10.
         self.xsize = 10.
         self.ysize = 10.
         
+        
+        self.nodes = np.empty((self.m,self.n),dtype = object)
+        
+        #Connect actions and signal to UI
         self.hookupUI()
+        #Draw the grid
         self.drawCore()
     
     def drawCore(self): 
         if dbg: print('CoreDockWidget.drawCore()')
-        btn = QtGui.QPushButton('woo')
+
         layout = self.coreWidget.layout()
-        layout.addWidget(btn)
+        #layout.addWidget(btn)
+        
+        for (i,j),node in np.ndenumerate(self.nodes):
+            lbl = "%s,%s"%(i,j)
+            btn = QtGui.QPushButton(lbl)
+            
+            #btn.resize(QtCore.QSize(30,30))
+            btn.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
+            self.nodes[i,j] = btn
+            layout.addWidget(btn,i,j)
+            btn.setStyleSheet('background-color: red')
         
     def hookupUI(self):
         if dbg: print('CoreDockWidget.hookupUI()')
@@ -60,6 +79,7 @@ class CoreDockWidget(QtGui.QDockWidget):
         self.ySizeLineEdit.editingFinished.connect(self.updateSize)
         self.mNodesLineEdit.editingFinished.connect(self.updateSize)
         self.nNodesLineEdit.editingFinished.connect(self.updateSize)
+        
         self.updateCorePushButton.clicked.connect(self.updateCore)
         
     def updateCore(self):
