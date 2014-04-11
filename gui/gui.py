@@ -6,6 +6,7 @@ from mplwidget import MplWidget as mpl
 from PyQt4 import uic
 
 dbg = True
+
 def path_to(file):
     #return absolute path to file
     return os.path.join(os.path.dirname(os.path.abspath(__file__)),file)
@@ -46,7 +47,15 @@ class GraphDockWidget(QtGui.QDockWidget):
     def hookupUI(self):
         if dbg: print('GraphDockWidget.hookupUI()')
 
-
+class CoreButton(QtGui.QPushButton):
+    def __init__(self,parent=None):
+        QtGui.QPushButton.__init__(self,parent)
+        policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,QtGui.QSizePolicy.Preferred)
+        policy.setHeightForWidth(True)
+        self.setSizePolicy(policy)
+    def heightForWidth(self,width):
+        return width
+        
 class CoreDockWidget(QtGui.QDockWidget):
     def __init__(self,parent=None):
         
@@ -81,14 +90,18 @@ class CoreDockWidget(QtGui.QDockWidget):
         
         for (i,j),node in np.ndenumerate(self.nodes):
             lbl = "%s,%s"%(i,j)
-            btn = QtGui.QPushButton(lbl)
+            btn = CoreButton(lbl)
             
             #btn.resize(QtCore.QSize(30,30))
-            btn.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
+            #btn.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
+            btn.setSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+            btn.setMinimumSize(10,10)
+            btn.resize(QtCore.QSize(30,30))
+            
             self.nodes[i,j] = btn
             layout.addWidget(btn,i,j)
             btn.setStyleSheet('background-color: red')
-
+        
         
     def hookupUI(self):
         if dbg: print('CoreDockWidget.hookupUI()')
