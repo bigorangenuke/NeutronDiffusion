@@ -3,13 +3,26 @@ from PyQt4 import QtGui,QtCore
 import os
 import numpy as np
 from mplwidget import MplWidget as mpl
-
 from PyQt4 import uic
 
 dbg = True
 def path_to(file):
     #return absolute path to file
     return os.path.join(os.path.dirname(os.path.abspath(__file__)),file)
+
+def layout_widgets(layout):
+    #return iterator of widgets in layout
+    return (layout.itemAt(i) for i in range(layout.count))
+
+def removeWidgetsFromLayout(layout):
+    #deletes all the widgets in layout
+    try:
+        for i in reversed(range(layout.count())):
+            layout.itemAt(i).widget().setParent(None)
+    except:
+        print('gui.removeWidgetsFromLayout() ERROR')
+        return False
+    return True
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self,parent=None):
@@ -28,12 +41,11 @@ class GraphDockWidget(QtGui.QDockWidget):
         QtGui.QDockWidget.__init__(self,parent)
         uic.loadUi(path_to('graphwidget.ui'),self)
         self.graph = self.mplwidget
-        
         self.hookupUI()
-        
         
     def hookupUI(self):
         if dbg: print('GraphDockWidget.hookupUI()')
+
 
 class CoreDockWidget(QtGui.QDockWidget):
     def __init__(self,parent=None):
@@ -57,11 +69,15 @@ class CoreDockWidget(QtGui.QDockWidget):
         #Draw the grid
         self.drawCore()
     
+    
+
     def drawCore(self): 
         if dbg: print('CoreDockWidget.drawCore()')
-
+        self.nodes = np.empty((self.m,self.n),dtype = object)
         layout = self.coreWidget.layout()
         #layout.addWidget(btn)
+      
+        removeWidgetsFromLayout(layout)
         
         for (i,j),node in np.ndenumerate(self.nodes):
             lbl = "%s,%s"%(i,j)
@@ -72,6 +88,7 @@ class CoreDockWidget(QtGui.QDockWidget):
             self.nodes[i,j] = btn
             layout.addWidget(btn,i,j)
             btn.setStyleSheet('background-color: red')
+
         
     def hookupUI(self):
         if dbg: print('CoreDockWidget.hookupUI()')
