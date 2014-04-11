@@ -1,28 +1,20 @@
 from numpy import sqrt
-
+dbg = False
 class Material():
     
     def __init__(self,material):
-                #print(lines)
-#         self.name=                  lines[0]
-#         self.Sigma_tr =             lines[1]
-#         self.Sigma_a =              lines[2]
-#         self.nuSigma_f =            lines[3]
-#         self.relative_absorption =  lines[4]
-#         self.atomic_mass =          lines[5]
-#         self.Sigma_R =              lines[6]
 
-        self.nuSigma_f = []
-        self.sigma_f = []
-        self.sigma_a = []
-        self.sigma_R = []
-        self.d=[]
+        self.nuSigma_f =    []
+        self.sigma_f =      []
+        self.sigma_a =      []
+        self.sigma_R =      []
+        self.d=             []
+        
         #Slow group is last
         #Load data for an arbitary number of groups
         for i,line in enumerate(material):
             line = line.split(',')
             line = list((l.strip() for l in line))
-            print(line)
             if i == 0:
                 for l in line[1:]:
                     self.nuSigma_f.append(float(l)) 
@@ -38,8 +30,14 @@ class Material():
             if i == 4:
                 for l in line[1:]:
                     self.sigma_R.append(float(l)) 
+        if dbg: print("Group 1 constants = ",self.groupConstants(1))
         
-
+    def groupConstants(self,group):
+        return self.nuSigma_f[group],self.sigma_f[group],self.sigma_a[group],self.sigma_R[group],self.d[group]  
+    
+    def diffusionLength(self,group):
+        return sqrt(self.d[group]/self.sigma_a[group])
+    
 #     def L(self):
 #         #Extrapolation Length
 #         s_tr = self.Sigma_tr

@@ -21,9 +21,6 @@ class Reactor():
 		
 		self.load_materials(groups = 2)
 
-		#self.sigma_tr = self.get_sigma_tr()
-		#self.sigma_a = self.get_sigma_a()
-
 		thenodes = np.empty((self.n,self.m),dtype=object)
 
 		for j in range(self.m):
@@ -45,7 +42,6 @@ class Reactor():
 			self.materials.append(material.Material(self.load_file('pwr_4_group.txt')))
 		else: print('ERROR. No data for %s groups'%(g))
 
-
 	
 	def load_file(self,file):
 		f = open(file)
@@ -54,7 +50,7 @@ class Reactor():
 		return lines
 		
 	def __repr__(self):
-		return "Rx(m = %s, n =  %s)"%(self.m,self.n)
+		return "Rx \tNodes = (%s,%s)"%(self.m,self.n)
 
 
 if __name__=='__main__':
