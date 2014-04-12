@@ -47,15 +47,7 @@ class GraphDockWidget(QtGui.QDockWidget):
     def hookupUI(self):
         if dbg: print('GraphDockWidget.hookupUI()')
 
-class CoreButton(QtGui.QPushButton):
-    def __init__(self,parent=None):
-        QtGui.QPushButton.__init__(self,parent)
-        policy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,QtGui.QSizePolicy.Preferred)
-        policy.setHeightForWidth(True)
-        self.setSizePolicy(policy)
-    def heightForWidth(self,width):
-        return width
-     
+
 class CoreDockWidget(QtGui.QDockWidget):
     def __init__(self,parent=None):
         
@@ -90,8 +82,13 @@ class CoreDockWidget(QtGui.QDockWidget):
         
         self.loadCorePushButton.clicked.connect(self.loadCore)
         self.saveCorePushButton.clicked.connect(self.saveCore)
+        
+        
     def saveCore(self):
         if dbg: print('CoreDockWidget.saveCore()')
+        
+        
+        
     def loadCore(self):
         if dbg: print('CoreDockWidget.loadCore()') 
         
@@ -103,19 +100,36 @@ class CoreDockWidget(QtGui.QDockWidget):
       
         removeWidgetsFromLayout(layout)
         
-        for (i,j),node in np.ndenumerate(self.nodes):
-            lbl = "%s,%s"%(i,j)
-            btn = CoreButton(lbl)
-            
-            #btn.resize(QtCore.QSize(30,30))
-            #btn.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
-            btn.setSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
-            btn.setMinimumSize(10,10)
-            btn.resize(QtCore.QSize(30,30))
-            
-            self.nodes[i,j] = btn
-            layout.addWidget(btn,i,j)
-            btn.setStyleSheet('background-color: red')
+        tbl = QtGui.QTableWidget(self.m,self.n)
+        tbl.verticalHeader().setVisible(True)
+        tbl.horizontalHeader().setVisible(True)
+        
+        cellSize = 20
+        
+        allRows = tbl.rowCount()
+        for row in range(0,allRows):
+            tbl.setRowHeight(row,cellSize)
+        
+        allColumns = tbl.columnCount()
+        for col in range(0,allColumns):
+            tbl.setColumnWidth(col,cellSize)
+        
+        layout.addWidget(tbl)
+    
+    
+#         for (i,j),node in np.ndenumerate(self.nodes):
+#             lbl = "%s,%s"%(i,j)
+#             btn = CoreButton(lbl).nodes.shape[0]
+#             
+#             #btn.resize(QtCore.QSize(30,30))
+#             #btn.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
+#             btn.setSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+#             btn.setMinimumSize(10,10)
+#             btn.resize(QtCore.QSize(30,30))
+#             
+#             self.nodes[i,j] = btn
+#             layout.addWidget(btn,i,j)
+#             btn.setStyleSheet('background-color: red')
         
         
 
