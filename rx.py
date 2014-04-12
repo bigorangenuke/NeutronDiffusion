@@ -38,7 +38,7 @@ class Reactor():
 			if dbg: print('Two Group')
 			self.materials.append(material.Material(self.load_file('pwr_2_group.txt')))
 		elif g == 4:
-			if dbg: print('four group')
+			if dbg: print('Four Group')
 			self.materials.append(material.Material(self.load_file('pwr_4_group.txt')))
 		else: print('ERROR. No data for %s groups'%(g))
 
@@ -54,7 +54,6 @@ class Reactor():
 
 
 if __name__=='__main__':
-
 	reactor = Reactor(size = [5,5])
 
 

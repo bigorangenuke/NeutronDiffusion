@@ -55,7 +55,7 @@ class CoreButton(QtGui.QPushButton):
         self.setSizePolicy(policy)
     def heightForWidth(self,width):
         return width
-        
+     
 class CoreDockWidget(QtGui.QDockWidget):
     def __init__(self,parent=None):
         
@@ -78,8 +78,23 @@ class CoreDockWidget(QtGui.QDockWidget):
         #Draw the grid
         self.drawCore()
     
-    
-
+    def hookupUI(self):
+        if dbg: print('CoreDockWidget.hookupUI()')
+        self.xSizeLineEdit.editingFinished.connect(self.updateSize)
+        self.ySizeLineEdit.editingFinished.connect(self.updateSize)
+        self.mNodesLineEdit.editingFinished.connect(self.updateSize)
+        self.nNodesLineEdit.editingFinished.connect(self.updateSize)
+        self.materialComboBox.addItems(['Select Material', 'PWR','Water','Graphite'])
+        
+        self.updateCorePushButton.clicked.connect(self.updateCore)
+        
+        self.loadCorePushButton.clicked.connect(self.loadCore)
+        self.saveCorePushButton.clicked.connect(self.saveCore)
+    def saveCore(self):
+        if dbg: print('CoreDockWidget.saveCore()')
+    def loadCore(self):
+        if dbg: print('CoreDockWidget.loadCore()') 
+        
     def drawCore(self): 
         if dbg: print('CoreDockWidget.drawCore()')
         self.nodes = np.empty((self.m,self.n),dtype = object)
@@ -103,14 +118,7 @@ class CoreDockWidget(QtGui.QDockWidget):
             btn.setStyleSheet('background-color: red')
         
         
-    def hookupUI(self):
-        if dbg: print('CoreDockWidget.hookupUI()')
-        self.xSizeLineEdit.editingFinished.connect(self.updateSize)
-        self.ySizeLineEdit.editingFinished.connect(self.updateSize)
-        self.mNodesLineEdit.editingFinished.connect(self.updateSize)
-        self.nNodesLineEdit.editingFinished.connect(self.updateSize)
-        
-        self.updateCorePushButton.clicked.connect(self.updateCore)
+
         
     def updateCore(self):
         if dbg: print('CoreDockWidget.updateCore()')
