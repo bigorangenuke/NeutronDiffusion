@@ -25,6 +25,14 @@ def removeWidgetsFromLayout(layout):
         return False
     return True
 
+class CellMaterial():
+    def __init__(self):
+        self.materials = {'PWR':0,'Water':1,'Graphite':2}
+        self.pwr = self.materials['PWR']
+        self.water= self.materials['Water']
+        self.graphite=self.materials['Graphite']
+        
+        
 class MainWindow(QtGui.QMainWindow):
     def __init__(self,parent=None):
         if dbg: print('MainWindow.__init__()')
@@ -46,8 +54,14 @@ class GraphDockWidget(QtGui.QDockWidget):
         
     def hookupUI(self):
         if dbg: print('GraphDockWidget.hookupUI()')
-
-
+            
+class NodeTableWidgetItem(QtGui.QTableWidgetItem):
+    def __init__(self,parent = None):
+        super(NodeTableWidgetItem,self).__init__()
+        
+    def __repr__(self):
+        return 'woo'
+    
 class CoreDockWidget(QtGui.QDockWidget):
     def __init__(self,parent=None):
         
@@ -67,6 +81,8 @@ class CoreDockWidget(QtGui.QDockWidget):
         
         #Connect actions and signal to UI
         self.hookupUI()
+        
+        self.coreTable = None
         #Draw the grid
         self.drawCore()
     
@@ -76,14 +92,21 @@ class CoreDockWidget(QtGui.QDockWidget):
         self.ySizeLineEdit.editingFinished.connect(self.updateSize)
         self.mNodesLineEdit.editingFinished.connect(self.updateSize)
         self.nNodesLineEdit.editingFinished.connect(self.updateSize)
-        self.materialComboBox.addItems(['Select Material', 'PWR','Water','Graphite'])
+        
+        self.materialComboBox.addItems(list(CellMaterial().materials.keys()))
+        self.materialComboBox.activated[str].connect(self.materialComboBoxActivated)
+        
+        
         
         self.updateCorePushButton.clicked.connect(self.updateCore)
         
         self.loadCorePushButton.clicked.connect(self.loadCore)
         self.saveCorePushButton.clicked.connect(self.saveCore)
         
-        
+    def materialComboBoxActivated(self,text):
+        #Change selection in table to be material
+        print(text)
+    
     def saveCore(self):
         if dbg: print('CoreDockWidget.saveCore()')
         
@@ -114,22 +137,26 @@ class CoreDockWidget(QtGui.QDockWidget):
         for col in range(0,allColumns):
             tbl.setColumnWidth(col,cellSize)
         
+        for i in range(allRows):
+            for j in range(allColumns):
+                twi = NodeTableWidgetItem()
+                tbl.setItem(i,j,twi)
+        
+ 
+        tbl.selectionModel().selectionChanged.connect(self.selectionChanged)
         layout.addWidget(tbl)
+        
+        self.coreTable = tbl
     
     
-#         for (i,j),node in np.ndenumerate(self.nodes):
-#             lbl = "%s,%s"%(i,j)
-#             btn = CoreButton(lbl).nodes.shape[0]
-#             
-#             #btn.resize(QtCore.QSize(30,30))
-#             #btn.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
-#             btn.setSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
-#             btn.setMinimumSize(10,10)
-#             btn.resize(QtCore.QSize(30,30))
-#             
-#             self.nodes[i,j] = btn
-#             layout.addWidget(btn,i,j)
-#             btn.setStyleSheet('background-color: red')
+    
+    def selectionChanged(self):
+        if dbg: print('CoreDockWidget.selectionChanged()')
+
+        for item in self.coreTable.selectedRanges():
+            print(item.leftColumn())
+        for item in self.coreTable.selectedItems():
+            print('selected items = ',item)
         
         
 
