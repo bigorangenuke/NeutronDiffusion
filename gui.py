@@ -40,7 +40,7 @@ class MainWindow(QtGui.QMainWindow):
         #build the .ui file
         uic.loadUi(path_to('mainwindow.ui'), self)
         self.hookupUI()
-        
+    
     def hookupUI(self):
         if dbg: print('MainWindow.hookupUI()')
         
@@ -56,12 +56,37 @@ class GraphDockWidget(QtGui.QDockWidget):
         if dbg: print('GraphDockWidget.hookupUI()')
             
 class NodeTableWidgetItem(QtGui.QTableWidgetItem):
-    def __init__(self,parent = None):
+    def __init__(self,i,j,material=None,parent = None):
         super(NodeTableWidgetItem,self).__init__()
+        self.i = int(i)
+        self.j = int(j)
+        self.material = material
+        if material:self.color()
+
+    def set_material(self,material):
+        if dbg: print('NodeTableWidgetItem.set_material()')
+        self.material = material
+        self.color()
         
+        
+    def color(self):
+        color = QtGui.QColor(0,255,0)
+        print('material = ', self.material)
+        if self.material==0:
+            color = QtGui.QColor(255,0,0)
+        elif self.material==1:
+            color=  QtGui.QColor(0,0,255)
+        elif self.material==2:
+            color = QtGui.QColor(60,60,60)
+        brush = QtGui.QBrush(color)
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        self.setBackground(brush)
+ 
+
     def __repr__(self):
-        return 'woo'
+        return self.row,self.column,self.material
     
+
 class CoreDockWidget(QtGui.QDockWidget):
     def __init__(self,parent=None):
         
@@ -96,26 +121,54 @@ class CoreDockWidget(QtGui.QDockWidget):
         self.materialComboBox.addItems(list(CellMaterial().materials.keys()))
         self.materialComboBox.activated[str].connect(self.materialComboBoxActivated)
         
-        
-        
         self.updateCorePushButton.clicked.connect(self.updateCore)
         
         self.loadCorePushButton.clicked.connect(self.loadCore)
         self.saveCorePushButton.clicked.connect(self.saveCore)
         
     def materialComboBoxActivated(self,text):
+        
         #Change selection in table to be material
-        print(text)
+        for item in self.coreTable.selectedItems():
+            item.set_material(int(CellMaterial().materials[text]))
+        
     
     def saveCore(self):
         if dbg: print('CoreDockWidget.saveCore()')
-        
-        
+        allRows = self.coreTable.rowCount()
+        allColumns = self.coreTable.columnCount()
+    
+        filename = QtGui.QFileDialog.getSaveFileName(self)
+         
+        fn = '%s.core'%(filename)
+        f = open(fn,'w')
+        print(f)
+        for i in range(allRows):
+            for j in range(allColumns):
+                item = self.coreTable.item(i,j)
+                wstr = "%s,%s,%s\n"%(i,j,item.material)
+                f.write(wstr) 
+        f.close()
         
     def loadCore(self):
+        
+        filename = QtGui.QFileDialog.getOpenFileName(self)
+        print(filename)
+        if not filename: raise
+        f = open(filename,'r')
+        lines = f.readlines()
+        f.close()
+        core =[]
+        
+        for line in lines:
+            i,j,m = line.split(',')
+            core.append(NodeTableWidgetItem(i,j,m))
+        self.drawCore(core)
+        
         if dbg: print('CoreDockWidget.loadCore()') 
         
-    def drawCore(self): 
+    def drawCore(self,core = None):
+            
         if dbg: print('CoreDockWidget.drawCore()')
         self.nodes = np.empty((self.m,self.n),dtype = object)
         layout = self.coreWidget.layout()
@@ -137,30 +190,26 @@ class CoreDockWidget(QtGui.QDockWidget):
         for col in range(0,allColumns):
             tbl.setColumnWidth(col,cellSize)
         
-        for i in range(allRows):
-            for j in range(allColumns):
-                twi = NodeTableWidgetItem()
-                tbl.setItem(i,j,twi)
-        
- 
+        if core:
+            for node in core:
+                node.color()
+                tbl.setItem(node.i,node.j,node)
+                
+        else:
+            for i in range(allRows):
+                for j in range(allColumns):
+                    tbl.setItem(i,j, NodeTableWidgetItem(i,j))      
         tbl.selectionModel().selectionChanged.connect(self.selectionChanged)
         layout.addWidget(tbl)
         
         self.coreTable = tbl
-    
-    
-    
+
     def selectionChanged(self):
         if dbg: print('CoreDockWidget.selectionChanged()')
 
         for item in self.coreTable.selectedRanges():
             print(item.leftColumn())
-        for item in self.coreTable.selectedItems():
-            print('selected items = ',item)
-        
-        
 
-        
     def updateCore(self):
         if dbg: print('CoreDockWidget.updateCore()')
         self.drawCore()
