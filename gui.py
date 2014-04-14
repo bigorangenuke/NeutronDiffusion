@@ -58,10 +58,11 @@ class GraphDockWidget(QtGui.QDockWidget):
 class NodeTableWidgetItem(QtGui.QTableWidgetItem):
     def __init__(self,i,j,material=None,parent = None):
         super(NodeTableWidgetItem,self).__init__()
+        if not material:
+            material = 0
         self.i = int(i)
         self.j = int(j)
-        self.material = material
-        if material:self.color()
+        self.set_material(material)
 
     def set_material(self,material):
         if dbg: print('NodeTableWidgetItem.set_material()')
@@ -70,7 +71,7 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
         
         
     def color(self):
-        color = QtGui.QColor(0,255,0)
+        color = QtGui.QColor(255,255,255)
         print('material = ', self.material)
         if self.material==0:
             color = QtGui.QColor(255,0,0)
@@ -82,7 +83,7 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
         brush.setStyle(QtCore.Qt.SolidPattern)
         self.setBackground(brush)
  
-
+ 
     def __repr__(self):
         return self.row,self.column,self.material
     
@@ -100,14 +101,12 @@ class CoreDockWidget(QtGui.QDockWidget):
         self.n = 10.
         self.xsize = 10.
         self.ysize = 10.
-        
-        
         self.nodes = np.empty((self.m,self.n),dtype = object)
         
         #Connect actions and signal to UI
         self.hookupUI()
-        
         self.coreTable = None
+        
         #Draw the grid
         self.drawCore()
     
@@ -130,6 +129,7 @@ class CoreDockWidget(QtGui.QDockWidget):
         
         #Change selection in table to be material
         for item in self.coreTable.selectedItems():
+            print('new material = ',text)
             item.set_material(int(CellMaterial().materials[text]))
         
     
@@ -137,10 +137,10 @@ class CoreDockWidget(QtGui.QDockWidget):
         if dbg: print('CoreDockWidget.saveCore()')
         allRows = self.coreTable.rowCount()
         allColumns = self.coreTable.columnCount()
-    
+     
         filename = QtGui.QFileDialog.getSaveFileName(self)
-         
-        fn = '%s.core'%(filename)
+          
+        fn = '%s'%(filename)
         f = open(fn,'w')
         print(f)
         for i in range(allRows):
@@ -152,23 +152,24 @@ class CoreDockWidget(QtGui.QDockWidget):
         
     def loadCore(self):
         
-        filename = QtGui.QFileDialog.getOpenFileName(self)
+        filename = QtGui.QFileDialog.getOpenFileName()
         print(filename)
         if not filename: raise
         f = open(filename,'r')
         lines = f.readlines()
         f.close()
         core =[]
-        
+         
         for line in lines:
             i,j,m = line.split(',')
             core.append(NodeTableWidgetItem(i,j,m))
-        self.drawCore(core)
-        
+            
+        self.updateCore()
+         
         if dbg: print('CoreDockWidget.loadCore()') 
         
     def drawCore(self,core = None):
-            
+        
         if dbg: print('CoreDockWidget.drawCore()')
         self.nodes = np.empty((self.m,self.n),dtype = object)
         layout = self.coreWidget.layout()
@@ -191,24 +192,27 @@ class CoreDockWidget(QtGui.QDockWidget):
             tbl.setColumnWidth(col,cellSize)
         
         if core:
+            print('Draw Core')
             for node in core:
                 node.color()
                 tbl.setItem(node.i,node.j,node)
-                
         else:
             for i in range(allRows):
                 for j in range(allColumns):
-                    tbl.setItem(i,j, NodeTableWidgetItem(i,j))      
+                    tbl.setItem(i,j, NodeTableWidgetItem(i,j))
+                          
+                    
         tbl.selectionModel().selectionChanged.connect(self.selectionChanged)
+        
         layout.addWidget(tbl)
         
         self.coreTable = tbl
 
     def selectionChanged(self):
         if dbg: print('CoreDockWidget.selectionChanged()')
-
-        for item in self.coreTable.selectedRanges():
-            print(item.leftColumn())
+# 
+#         for item in self.coreTable.selectedRanges():
+#             print(item.leftColumn())
 
     def updateCore(self):
         if dbg: print('CoreDockWidget.updateCore()')
