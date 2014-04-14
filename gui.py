@@ -65,7 +65,7 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
         self.set_material(material)
 
     def set_material(self,material):
-        if dbg: print('NodeTableWidgetItem.set_material()')
+        #if dbg: print('NodeTableWidgetItem.set_material()')
         self.material = material
         self.color()
         
@@ -97,10 +97,7 @@ class CoreDockWidget(QtGui.QDockWidget):
         uic.loadUi(path_to('corewidget.ui'),self)
         
         #Give some initial values for the size attributes
-        self.m = 10.
-        self.n = 10.
-        self.xsize = 10.
-        self.ysize = 10.
+        self.set_reactor_parameters(10,10,10.,10.)
         self.nodes = np.empty((self.m,self.n),dtype = object)
         
         #Connect actions and signal to UI
@@ -109,7 +106,30 @@ class CoreDockWidget(QtGui.QDockWidget):
         
         #Draw the grid
         self.drawCore()
-    
+
+    def set_reactor_parameters(self,m,n,xsize,ysize):
+    	self.set_m(m)
+    	self.set_n(n)
+    	self.set_xsize(xsize)
+    	self.set_ysize(ysize)
+
+    def set_m(self,m):
+    	self.mNodesLineEdit.setText(str(m))
+    	self.m = m
+
+    def set_n(self,n):
+    	self.nNodesLineEdit.setText(str(n))
+    	self.n = n
+
+    def set_xsize(self,xsize):
+
+    	self.xSizeLineEdit.setText(str(xsize))
+    	self.xsize = xsize
+
+    def set_ysize(self,ysize):
+    	self.ySizeLineEdit.setText(str(ysize))
+    	self.ysize = ysize
+
     def hookupUI(self):
         if dbg: print('CoreDockWidget.hookupUI()')
         self.xSizeLineEdit.editingFinished.connect(self.updateSize)
@@ -149,7 +169,7 @@ class CoreDockWidget(QtGui.QDockWidget):
                 wstr = "%s,%s,%s\n"%(i,j,item.material)
                 f.write(wstr) 
         f.close()
-        
+
     def loadCore(self):
         
         filename = QtGui.QFileDialog.getOpenFileName()
@@ -160,26 +180,33 @@ class CoreDockWidget(QtGui.QDockWidget):
         f.close()
         core =[]
          
+        ctable = QtGui.QTableWidget(self.m,self.n)
         for line in lines:
-            i,j,m = line.split(',')
-            core.append(NodeTableWidgetItem(i,j,m))
+            l = line.split(',')
+            print(l)
+            i = l[0]
+            j = l[1]
+
+            core.append(NodeTableWidgetItem(i,j))
+            core[i,j].set_material(m)
             
-        self.updateCore()
+        return core
          
         if dbg: print('CoreDockWidget.loadCore()') 
-        
+        #item.set_material(int(CellMaterial().materials[text]))
     def drawCore(self,core = None):
         
         if dbg: print('CoreDockWidget.drawCore()')
         self.nodes = np.empty((self.m,self.n),dtype = object)
         layout = self.coreWidget.layout()
         #layout.addWidget(btn)
-      
+
+      	#Erase the current core
         removeWidgetsFromLayout(layout)
         
         tbl = QtGui.QTableWidget(self.m,self.n)
-        tbl.verticalHeader().setVisible(True)
-        tbl.horizontalHeader().setVisible(True)
+        # tbl.verticalHeader().setVisible(True)
+        # tbl.horizontalHeader().setVisible(True)
         
         cellSize = 20
         
@@ -216,6 +243,7 @@ class CoreDockWidget(QtGui.QDockWidget):
 
     def updateCore(self):
         if dbg: print('CoreDockWidget.updateCore()')
+        self.updateSize()
         self.drawCore()
         
     def updateSize(self):
@@ -225,7 +253,6 @@ class CoreDockWidget(QtGui.QDockWidget):
         self.xsize = float(self.mNodesLineEdit.text())
         self.ysize = float(self.ySizeLineEdit.text())
         
-
 
 def setupMainWindow():
 
