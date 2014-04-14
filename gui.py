@@ -1,11 +1,17 @@
 from PyQt4 import QtGui,QtCore
 
 import os
-import numpy as np
-from mplwidget import MplWidget as mpl
+#from mplwidget import MplWidget as mpl
 from PyQt4 import uic
-
+from jtools import resizeTableCells
 dbg = True
+
+DEFAULT_M_NODES = 5
+DEFAULT_N_NODES = 5
+DEFAULT_X_SIZE = 1.
+DEFAULT_Y_SIZE = 1.
+
+CELL_SIZE = 20
 
 def path_to(file):
     #return absolute path to file
@@ -27,7 +33,8 @@ def removeWidgetsFromLayout(layout):
 
 class CellMaterial():
     def __init__(self):
-        self.materials = {'PWR':0,'Water':1,'Graphite':2}
+        self.materials = {'None': 0,'PWR':1,'Water':2,'Graphite':3}
+        self.none = 0
         self.pwr = self.materials['PWR']
         self.water= self.materials['Water']
         self.graphite=self.materials['Graphite']
@@ -54,15 +61,26 @@ class GraphDockWidget(QtGui.QDockWidget):
         
     def hookupUI(self):
         if dbg: print('GraphDockWidget.hookupUI()')
-            
+        
+
 class NodeTableWidgetItem(QtGui.QTableWidgetItem):
+    #Custom TableWidgetItemType
+    #Holds a reference to its location
+    #Method for coloring
     def __init__(self,i,j,material=None,parent = None):
         super(NodeTableWidgetItem,self).__init__()
+        
+        print ('init NodeTableWidgetItem')
+        
         if not material:
             material = 0
+            
+
         self.i = int(i)
         self.j = int(j)
+        print('Material = ',material)
         self.set_material(material)
+        
 
     def set_material(self,material):
         #if dbg: print('NodeTableWidgetItem.set_material()')
@@ -71,23 +89,22 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
         
         
     def color(self):
+        print('NodeTableWidgetItem.color()')
         color = QtGui.QColor(255,255,255)
-        print('material = ', self.material)
-        if self.material==0:
+        #print('material = ', self.material)
+        if self.material==1:
             color = QtGui.QColor(255,0,0)
-        elif self.material==1:
-            color=  QtGui.QColor(0,0,255)
         elif self.material==2:
+            color=  QtGui.QColor(0,0,255)
+        elif self.material==3:
             color = QtGui.QColor(60,60,60)
         brush = QtGui.QBrush(color)
         brush.setStyle(QtCore.Qt.SolidPattern)
         self.setBackground(brush)
  
- 
     def __repr__(self):
         return self.row,self.column,self.material
     
-
 class CoreDockWidget(QtGui.QDockWidget):
     def __init__(self,parent=None):
         
@@ -97,38 +114,37 @@ class CoreDockWidget(QtGui.QDockWidget):
         uic.loadUi(path_to('corewidget.ui'),self)
         
         #Give some initial values for the size attributes
-        self.set_reactor_parameters(10,10,10.,10.)
-        self.nodes = np.empty((self.m,self.n),dtype = object)
-        
+        self.set_reactor_parameters(DEFAULT_M_NODES,DEFAULT_N_NODES,DEFAULT_X_SIZE,DEFAULT_Y_SIZE)
+
+        self.coreTable = None
+        core = self.loadBlankCoreTable()
+        self.coreTable = core
+        self.drawCore(core)
         #Connect actions and signal to UI
         self.hookupUI()
-        self.coreTable = None
+    
         
-        #Draw the grid
-        self.drawCore()
-
     def set_reactor_parameters(self,m,n,xsize,ysize):
-    	self.set_m(m)
-    	self.set_n(n)
-    	self.set_xsize(xsize)
-    	self.set_ysize(ysize)
+        self.set_m(m)
+        self.set_n(n)
+        self.set_xsize(xsize)
+        self.set_ysize(ysize)
 
     def set_m(self,m):
-    	self.mNodesLineEdit.setText(str(m))
-    	self.m = m
+        self.mNodesLineEdit.setText(str(m))
+        self.m = m
 
     def set_n(self,n):
-    	self.nNodesLineEdit.setText(str(n))
-    	self.n = n
+        self.nNodesLineEdit.setText(str(n))
+        self.n = n
 
     def set_xsize(self,xsize):
-
-    	self.xSizeLineEdit.setText(str(xsize))
-    	self.xsize = xsize
+        self.xSizeLineEdit.setText(str(xsize))
+        self.xsize = xsize
 
     def set_ysize(self,ysize):
-    	self.ySizeLineEdit.setText(str(ysize))
-    	self.ysize = ysize
+        self.ySizeLineEdit.setText(str(ysize))
+        self.ysize = ysize
 
     def hookupUI(self):
         if dbg: print('CoreDockWidget.hookupUI()')
@@ -140,111 +156,143 @@ class CoreDockWidget(QtGui.QDockWidget):
         self.materialComboBox.addItems(list(CellMaterial().materials.keys()))
         self.materialComboBox.activated[str].connect(self.materialComboBoxActivated)
         
-        self.updateCorePushButton.clicked.connect(self.updateCore)
+        self.updateCorePushButton.clicked.connect(self.updateCoreButtonIsPressed)
         
-        self.loadCorePushButton.clicked.connect(self.loadCore)
+        self.loadCorePushButton.clicked.connect(self.loadCoreButtonIsPressed)
         self.saveCorePushButton.clicked.connect(self.saveCore)
         
     def materialComboBoxActivated(self,text):
-        
+        print ('CoreDockWidget.materialComboBoxActivated')
         #Change selection in table to be material
+        self.saveCore('_previouscore')
         for item in self.coreTable.selectedItems():
             print('new material = ',text)
             item.set_material(int(CellMaterial().materials[text]))
         
+        self.saveCore('_currentcore')
+        
+        
+        
     
-    def saveCore(self):
+    def saveCore(self,filename= None):
+        
+        #Save the core configuration to a file
         if dbg: print('CoreDockWidget.saveCore()')
+        
         allRows = self.coreTable.rowCount()
         allColumns = self.coreTable.columnCount()
-     
-        filename = QtGui.QFileDialog.getSaveFileName(self)
-          
-        fn = '%s'%(filename)
-        f = open(fn,'w')
-        print(f)
+        
+        if not filename:
+            filename = QtGui.QFileDialog.getSaveFileName(self)
+        
+        f = open(filename,'w')
+    
         for i in range(allRows):
             for j in range(allColumns):
                 item = self.coreTable.item(i,j)
                 wstr = "%s,%s,%s\n"%(i,j,item.material)
                 f.write(wstr) 
+
         f.close()
 
-    def loadCore(self):
-        
-        filename = QtGui.QFileDialog.getOpenFileName()
-        print(filename)
+    
+    def defaultCore(self):
+        self.updateSize()
+        return self.loadBlankCoreTable()
+    
+    def loadCoreButtonIsPressed(self):          
+        core = self.loadCoreTableFromFile()
+        self.drawCore(core)
+    
+    def loadBlankCoreTable(self):
+        core = QtGui.QTableWidget(self.m,self.n)
+        for i in range(self.m):
+            for j in range(self.n):
+                core.setItem(i,j,NodeTableWidgetItem(i,j,1))  
+        return core    
+        #self.drawCore(core)
+           
+    def loadCoreTableFromFile(self,filename=None):
+
+        if not filename: 
+            filename = QtGui.QFileDialog.getOpenFileName()
         if not filename: raise
+        
         f = open(filename,'r')
         lines = f.readlines()
         f.close()
-        core =[]
-         
+        
+        maxi = 0
+        maxj = 0
+        
+        for line in lines:
+            l = line.split(',')
+            i = int(l[0])
+            j = int(l[1])
+            if i>maxi: maxi=i
+            if j>maxj: maxj=j
+        
+        self.m = maxi+1
+        self.n = maxj+1
+        
         ctable = QtGui.QTableWidget(self.m,self.n)
         for line in lines:
             l = line.split(',')
-            print(l)
-            i = l[0]
-            j = l[1]
-
-            core.append(NodeTableWidgetItem(i,j))
-            core[i,j].set_material(m)
-            
-        return core
+            i = int(l[0])
+            j = int(l[1])
+            m = int(l[2].strip())
+            ctable.setItem(i,j,NodeTableWidgetItem(i,j,m))
+        print(ctable)
+        
+        cellSize=20
+        allRows = ctable.rowCount()
+        for row in range(0,allRows):
+            ctable.setRowHeight(row,cellSize)
          
-        if dbg: print('CoreDockWidget.loadCore()') 
-        #item.set_material(int(CellMaterial().materials[text]))
+        allColumns = ctable.columnCount()
+        for col in range(0,allColumns):
+            ctable.setColumnWidth(col,cellSize)  
+        return ctable
+
+    
+       
     def drawCore(self,core = None):
         
         if dbg: print('CoreDockWidget.drawCore()')
-        self.nodes = np.empty((self.m,self.n),dtype = object)
-        layout = self.coreWidget.layout()
-        #layout.addWidget(btn)
-
-      	#Erase the current core
-        removeWidgetsFromLayout(layout)
         
-        tbl = QtGui.QTableWidget(self.m,self.n)
-        # tbl.verticalHeader().setVisible(True)
-        # tbl.horizontalHeader().setVisible(True)
-        
-        cellSize = 20
-        
-        allRows = tbl.rowCount()
-        for row in range(0,allRows):
-            tbl.setRowHeight(row,cellSize)
-        
-        allColumns = tbl.columnCount()
-        for col in range(0,allColumns):
-            tbl.setColumnWidth(col,cellSize)
-        
-        if core:
-            print('Draw Core')
-            for node in core:
-                node.color()
-                tbl.setItem(node.i,node.j,node)
+        if not core:
+            core = self.defaultCore()
+            print('core is empty')
         else:
-            for i in range(allRows):
-                for j in range(allColumns):
-                    tbl.setItem(i,j, NodeTableWidgetItem(i,j))
-                          
-                    
-        tbl.selectionModel().selectionChanged.connect(self.selectionChanged)
-        
-        layout.addWidget(tbl)
-        
-        self.coreTable = tbl
+            print('core is not empty')
+        assert(core)
 
+         
+        #Get a pointer to the widget's layout in the gui
+        layout = self.coreWidget.layout()
+        
+        #Erase the current core from the layout
+        removeWidgetsFromLayout(layout)
+         
+        #Connect self.selectionchanged to the selectionChanged event on the table
+        core.selectionModel().selectionChanged.connect(self.selectionChanged)
+        
+        #Add it to the gui
+        layout.addWidget(core)
+    
+        #Save it
+        self.coreTable = resizeTableCells(core,20)
+    
     def selectionChanged(self):
         if dbg: print('CoreDockWidget.selectionChanged()')
-# 
-#         for item in self.coreTable.selectedRanges():
-#             print(item.leftColumn())
-
-    def updateCore(self):
-        if dbg: print('CoreDockWidget.updateCore()')
+        for item in self.coreTable.selectedRanges():
+            print(item.leftColumn())
+    
+    def updateCoreButtonIsPressed(self):
+        if dbg: print('CoreDockWidget.updateCoreButtonIsPressed()')
         self.updateSize()
-        self.drawCore()
+        core = self.loadBlankCoreTable()
+        self.drawCore(core)
         
     def updateSize(self):
         if dbg: print('CoreDockWidget.updateSize()')
@@ -256,12 +304,12 @@ class CoreDockWidget(QtGui.QDockWidget):
 
 def setupMainWindow():
 
-    graphDockWidget = GraphDockWidget()
-    mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea,graphDockWidget)
+    #graphDockWidget = GraphDockWidget()
+    #mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea,graphDockWidget)
     coreDockWidget = CoreDockWidget()
     mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea,coreDockWidget)
     
-    
+
     
 if __name__=='__main__':
     import numpy as np
@@ -272,7 +320,6 @@ if __name__=='__main__':
     setupMainWindow()
     mainWindow.show()
     
-
     x = np.linspace(0,7,1000)
     f = np.sin(x)
     plt.plot(x,f)
