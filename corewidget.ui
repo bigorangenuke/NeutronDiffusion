@@ -1,201 +1,198 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>coreDockWidget</class>
- <widget class="QDockWidget" name="coreDockWidget">
+ <class>Core</class>
+ <widget class="QWidget" name="Core">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>797</width>
-    <height>481</height>
+    <width>795</width>
+    <height>373</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
   <property name="windowTitle">
-   <string>Core</string>
+   <string>Form</string>
   </property>
-  <widget class="QWidget" name="coreDockWidgetVerticalLayout">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QPushButton" name="loadCorePushButton">
-      <property name="text">
-       <string>Load Core</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="saveCorePushButton">
-      <property name="text">
-       <string>Save Core</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="updateCorePushButton">
-      <property name="text">
-       <string>Update Core</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="widget" native="true">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <property name="leftMargin">
-        <number>10</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>11</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <property name="horizontalSpacing">
-        <number>1</number>
-       </property>
-       <property name="verticalSpacing">
-        <number>0</number>
-       </property>
-       <item row="1" column="3">
-        <widget class="QLineEdit" name="mNodesLineEdit">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <widget class="QWidget" name="coreTab">
+      <attribute name="title">
+       <string>Core</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="saveCorePushButton">
          <property name="text">
-          <string>10</string>
+          <string>Save Core</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="mNodesLabel">
+       <item>
+        <widget class="QPushButton" name="loadCorePushButton">
          <property name="text">
-          <string>M</string>
+          <string>Load Core</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="3">
-        <widget class="QLineEdit" name="xSizeLineEdit">
+       <item>
+        <widget class="QPushButton" name="updateCorePushButton">
          <property name="text">
-          <string>10</string>
+          <string>Update Core</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="5">
-        <widget class="QLabel" name="ySizeLabel">
-         <property name="text">
-          <string>Y</string>
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <property name="enabled">
+          <bool>true</bool>
          </property>
-        </widget>
-       </item>
-       <item row="3" column="6">
-        <widget class="QLineEdit" name="ySizeLineEdit">
-         <property name="text">
-          <string>10</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="xSizeLabel">
-         <property name="text">
-          <string>X</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="5">
-        <widget class="QLabel" name="nNodesLabel">
-         <property name="text">
-          <string>N</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="6">
-        <widget class="QLineEdit" name="nNodesLineEdit">
-         <property name="text">
-          <string>5</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="7">
-        <widget class="QComboBox" name="materialComboBox">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <property name="leftMargin">
+           <number>10</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>11</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>1</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <item row="1" column="3">
+           <widget class="QLineEdit" name="mNodesLineEdit">
+            <property name="text">
+             <string>10</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="mNodesLabel">
+            <property name="text">
+             <string>M</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QLineEdit" name="xSizeLineEdit">
+            <property name="text">
+             <string>10</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="5">
+           <widget class="QLabel" name="ySizeLabel">
+            <property name="text">
+             <string>Y</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="6">
+           <widget class="QLineEdit" name="ySizeLineEdit">
+            <property name="text">
+             <string>10</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="xSizeLabel">
+            <property name="text">
+             <string>X</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="QLabel" name="nNodesLabel">
+            <property name="text">
+             <string>N</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="6">
+           <widget class="QLineEdit" name="nNodesLineEdit">
+            <property name="text">
+             <string>5</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="7">
+           <widget class="QComboBox" name="materialComboBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="7">
+           <widget class="QLabel" name="materialComboBoxLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Material</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+         <zorder>mNodesLabel</zorder>
+         <zorder>xSizeLabel</zorder>
+         <zorder>xSizeLineEdit</zorder>
+         <zorder>ySizeLabel</zorder>
+         <zorder>ySizeLineEdit</zorder>
+         <zorder>mNodesLineEdit</zorder>
+         <zorder>nNodesLabel</zorder>
+         <zorder>nNodesLineEdit</zorder>
+         <zorder>materialComboBox</zorder>
+         <zorder>materialComboBoxLabel</zorder>
         </widget>
        </item>
-       <item row="1" column="7">
-        <widget class="QLabel" name="materialComboBoxLabel">
+       <item>
+        <widget class="QWidget" name="coreWidget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="text">
-          <string>Material</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
+         <layout class="QGridLayout" name="gridLayout"/>
         </widget>
        </item>
       </layout>
-      <zorder>mNodesLabel</zorder>
-      <zorder>xSizeLabel</zorder>
-      <zorder>xSizeLineEdit</zorder>
-      <zorder>ySizeLabel</zorder>
-      <zorder>ySizeLineEdit</zorder>
-      <zorder>mNodesLineEdit</zorder>
-      <zorder>nNodesLabel</zorder>
-      <zorder>nNodesLineEdit</zorder>
-      <zorder>materialComboBox</zorder>
-      <zorder>materialComboBoxLabel</zorder>
+      <zorder>loadCorePushButton</zorder>
+      <zorder>widget</zorder>
+      <zorder>coreWidget</zorder>
+      <zorder>updateCorePushButton</zorder>
+      <zorder>saveCorePushButton</zorder>
      </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="coreWidget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <layout class="QGridLayout" name="gridLayout"/>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Tab 2</string>
+      </attribute>
      </widget>
-    </item>
-    <item>
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Expanding</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-   </layout>
-  </widget>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

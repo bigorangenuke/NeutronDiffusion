@@ -14,6 +14,8 @@ def resizeTableCells(table,size):
     for j in range(columns):
         table.setColumnWidth(j,size)
     
+    return table
+
 def sphericalToCartesian(coord):
     r = coord[0]
     theta=coord[1]

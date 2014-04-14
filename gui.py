@@ -39,7 +39,6 @@ class CellMaterial():
         self.water= self.materials['Water']
         self.graphite=self.materials['Graphite']
         
-        
 class MainWindow(QtGui.QMainWindow):
     def __init__(self,parent=None):
         if dbg: print('MainWindow.__init__()')
@@ -47,7 +46,7 @@ class MainWindow(QtGui.QMainWindow):
         #build the .ui file
         uic.loadUi(path_to('mainwindow.ui'), self)
         self.hookupUI()
-    
+        
     def hookupUI(self):
         if dbg: print('MainWindow.hookupUI()')
         
@@ -105,10 +104,10 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
     def __repr__(self):
         return self.row,self.column,self.material
     
-class CoreDockWidget(QtGui.QDockWidget):
+class CoreWidget(QtGui.QWidget):
     def __init__(self,parent=None):
         
-        if dbg: print('CoreDockWidget.__init__()')
+        if dbg: print('CoreWidget.__init__()')
         #Load the core widget
         QtGui.QDockWidget.__init__(self,parent)
         uic.loadUi(path_to('corewidget.ui'),self)
@@ -116,13 +115,15 @@ class CoreDockWidget(QtGui.QDockWidget):
         #Give some initial values for the size attributes
         self.set_reactor_parameters(DEFAULT_M_NODES,DEFAULT_N_NODES,DEFAULT_X_SIZE,DEFAULT_Y_SIZE)
 
-        self.coreTable = None
         core = self.loadBlankCoreTable()
         self.coreTable = core
         self.drawCore(core)
         #Connect actions and signal to UI
         self.hookupUI()
     
+    #===============================================================================
+    # Parameters
+    #===============================================================================
         
     def set_reactor_parameters(self,m,n,xsize,ysize):
         self.set_m(m)
@@ -145,7 +146,18 @@ class CoreDockWidget(QtGui.QDockWidget):
     def set_ysize(self,ysize):
         self.ySizeLineEdit.setText(str(ysize))
         self.ysize = ysize
-
+        
+    def updateSize(self):
+        if dbg: print('CoreDockWidget.updateSize()')
+        self.m = int(self.mNodesLineEdit.text())
+        self.n = int(self.nNodesLineEdit.text())
+        self.xsize = float(self.mNodesLineEdit.text())
+        self.ysize = float(self.ySizeLineEdit.text())
+        
+        
+    #===============================================================================
+    # GUI
+    #===============================================================================
     def hookupUI(self):
         if dbg: print('CoreDockWidget.hookupUI()')
         self.xSizeLineEdit.editingFinished.connect(self.updateSize)
@@ -164,20 +176,21 @@ class CoreDockWidget(QtGui.QDockWidget):
     def materialComboBoxActivated(self,text):
         print ('CoreDockWidget.materialComboBoxActivated')
         #Change selection in table to be material
-        self.saveCore('_previouscore')
+        
         for item in self.coreTable.selectedItems():
             print('new material = ',text)
             item.set_material(int(CellMaterial().materials[text]))
         
         self.saveCore('_currentcore')
         
-        
-        
-    
+    #===========================================================================
+    # Core management
+    #===========================================================================
     def saveCore(self,filename= None):
         
         #Save the core configuration to a file
         if dbg: print('CoreDockWidget.saveCore()')
+        
         
         allRows = self.coreTable.rowCount()
         allColumns = self.coreTable.columnCount()
@@ -209,6 +222,8 @@ class CoreDockWidget(QtGui.QDockWidget):
         for i in range(self.m):
             for j in range(self.n):
                 core.setItem(i,j,NodeTableWidgetItem(i,j,1))  
+        
+        self.coreTable = core
         return core    
         #self.drawCore(core)
            
@@ -244,14 +259,6 @@ class CoreDockWidget(QtGui.QDockWidget):
             ctable.setItem(i,j,NodeTableWidgetItem(i,j,m))
         print(ctable)
         
-        cellSize=20
-        allRows = ctable.rowCount()
-        for row in range(0,allRows):
-            ctable.setRowHeight(row,cellSize)
-         
-        allColumns = ctable.columnCount()
-        for col in range(0,allColumns):
-            ctable.setColumnWidth(col,cellSize)  
         return ctable
 
     
@@ -275,7 +282,7 @@ class CoreDockWidget(QtGui.QDockWidget):
         removeWidgetsFromLayout(layout)
          
         #Connect self.selectionchanged to the selectionChanged event on the table
-        core.selectionModel().selectionChanged.connect(self.selectionChanged)
+        #core.selectionModel().selectionChanged.connect(self.selectionChanged)
         
         #Add it to the gui
         layout.addWidget(core)
@@ -283,10 +290,6 @@ class CoreDockWidget(QtGui.QDockWidget):
         #Save it
         self.coreTable = resizeTableCells(core,20)
     
-    def selectionChanged(self):
-        if dbg: print('CoreDockWidget.selectionChanged()')
-        for item in self.coreTable.selectedRanges():
-            print(item.leftColumn())
     
     def updateCoreButtonIsPressed(self):
         if dbg: print('CoreDockWidget.updateCoreButtonIsPressed()')
@@ -294,20 +297,16 @@ class CoreDockWidget(QtGui.QDockWidget):
         core = self.loadBlankCoreTable()
         self.drawCore(core)
         
-    def updateSize(self):
-        if dbg: print('CoreDockWidget.updateSize()')
-        self.m = int(self.mNodesLineEdit.text())
-        self.n = int(self.nNodesLineEdit.text())
-        self.xsize = float(self.mNodesLineEdit.text())
-        self.ysize = float(self.ySizeLineEdit.text())
+
         
 
 def setupMainWindow():
 
     #graphDockWidget = GraphDockWidget()
     #mainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea,graphDockWidget)
-    coreDockWidget = CoreDockWidget()
-    mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea,coreDockWidget)
+    coreWidget = CoreWidget()
+    mainWindow.setCentralWidget(coreWidget)
+    #mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea,coreDockWidget)
     
 
     
