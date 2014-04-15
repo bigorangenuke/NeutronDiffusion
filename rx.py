@@ -17,6 +17,9 @@ class Reactor():
 				self.n = sz[0]
 			else: print ("BAD TROUBLE. One or more reactor dimensions below MINIMUM_REACTOR_DIMENSION = %s"%(MINIMUM_REACTOR_DIMENSION))
 		
+		if 'file' in kwargs:
+			print('load file stuff')
+		
 		self.materials = []
 		
 		self.load_materials(groups = 2)
@@ -55,6 +58,8 @@ class Reactor():
 
 if __name__=='__main__':
 	reactor = Reactor(size = [5,5])
+	
+	
 
 
 
