@@ -4,6 +4,7 @@ import os
 #from mplwidget import MplWidget as mpl
 from PyQt4 import uic
 from jtools import resizeTableCells
+
 dbg = True
 
 DEFAULT_M_NODES = 5
@@ -153,8 +154,14 @@ class CoreWidget(QtGui.QWidget):
         self.n = int(self.nNodesLineEdit.text())
         self.xsize = float(self.mNodesLineEdit.text())
         self.ysize = float(self.ySizeLineEdit.text())
-        
-        
+    
+    def updateSizeFields(self):
+        if dbg: print('CoreDockWidget.updateSizeFields')
+        self.mNodesLineEdit.setText(str(self.m))
+        self.nNodesLineEdit.setText(str(self.n))
+        self.xSizeLineEdit.setText(str(self.xsize))
+        self.ySizeLineEdit.setText(str(self.ysize))    
+
     #===============================================================================
     # GUI
     #===============================================================================
@@ -196,8 +203,9 @@ class CoreWidget(QtGui.QWidget):
         allColumns = self.coreTable.columnCount()
         
         if not filename:
-            filename = QtGui.QFileDialog.getSaveFileName(self)
-        
+            filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Core to File', filter='*.core')
+
+
         f = open(filename,'w')
     
         for i in range(allRows):
@@ -230,7 +238,7 @@ class CoreWidget(QtGui.QWidget):
     def loadCoreTableFromFile(self,filename=None):
 
         if not filename: 
-            filename = QtGui.QFileDialog.getOpenFileName()
+            filename = QtGui.QFileDialog.getOpenFileName(filter='*.core')
         if not filename: raise
         
         f = open(filename,'r')
@@ -250,6 +258,8 @@ class CoreWidget(QtGui.QWidget):
         self.m = maxi+1
         self.n = maxj+1
         
+        self.updateSizeFields()
+
         ctable = QtGui.QTableWidget(self.m,self.n)
         for line in lines:
             l = line.split(',')
@@ -287,7 +297,7 @@ class CoreWidget(QtGui.QWidget):
         #Add it to the gui
         layout.addWidget(core)
     
-        #Save it
+        #Resize and save it
         self.coreTable = resizeTableCells(core,20)
     
     
@@ -319,9 +329,9 @@ if __name__=='__main__':
     setupMainWindow()
     mainWindow.show()
     
-    x = np.linspace(0,7,1000)
-    f = np.sin(x)
-    plt.plot(x,f)
+    #x = np.linspace(0,7,1000)
+    #f = np.sin(x)
+    #plt.plot(x,f)
     app.exec_()
 
  
