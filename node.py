@@ -3,6 +3,7 @@ class Node():
     def __init__(self,i,j,material=None):
         self.i = i
         self.j = j
+        print(material)
         self.material = material
         #self.sigma_tr = self.get_sigma_tr()
 #         self.sigma_a = self.get_sigma_a()
@@ -23,5 +24,5 @@ class Node():
 #         return sum(self.sigma_tr)
 #                    
     def __repr__(self):
-        return "(%s,%s)"%(self.i,self.j)
+        return "Node (%s,%s)"%(self.i,self.j)
 

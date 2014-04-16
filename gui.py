@@ -7,16 +7,19 @@ import jtools
 
 dbg = True
 
+#Default size values for the reactor.
 DEFAULT_M_NODES = 5
 DEFAULT_N_NODES = 5
 DEFAULT_X_SIZE = 1.
 DEFAULT_Y_SIZE = 1.
 
+#Pixel height/width for QTableWidgetItems
 CELL_SIZE = 20
 
 
 
 class CellMaterial():
+    #Dictionary of possible cell materials
     def __init__(self):
         self.materials = {'None': 0,'PWR':1,'Water':2,'Graphite':3}
         self.none = 0
@@ -54,7 +57,7 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
     def __init__(self,i,j,material=None,parent = None):
         super(NodeTableWidgetItem,self).__init__()
         
-        print ('init NodeTableWidgetItem')
+        if dbg: print ('gui.init NodeTableWidgetItem')
         
         if not material:
             material = 0
@@ -62,7 +65,7 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
 
         self.i = int(i)
         self.j = int(j)
-        print('Material = ',material)
+        if dbg:print('Material = ',material)
         self.set_material(material)
         
 
@@ -73,7 +76,7 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
         
         
     def color(self):
-        print('NodeTableWidgetItem.color()')
+        if dbg: print('gui.NodeTableWidgetItem.color()')
         color = QtGui.QColor(255,255,255)
         #print('material = ', self.material)
         if self.material==1:
@@ -92,7 +95,7 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
 class CoreWidget(QtGui.QWidget):
     def __init__(self,parent=None):
         
-        if dbg: print('CoreWidget.__init__()')
+        if dbg: print('gui.CoreWidget.__init__()')
         #Load the core widget
         QtGui.QDockWidget.__init__(self,parent)
         uic.loadUi(path_to('corewidget.ui'),self)
@@ -133,14 +136,14 @@ class CoreWidget(QtGui.QWidget):
         self.ysize = ysize
         
     def updateSize(self):
-        if dbg: print('CoreDockWidget.updateSize()')
+        if dbg: print('gui.CoreDockWidget.updateSize()')
         self.m = int(self.mNodesLineEdit.text())
         self.n = int(self.nNodesLineEdit.text())
         self.xsize = float(self.mNodesLineEdit.text())
         self.ysize = float(self.ySizeLineEdit.text())
     
     def updateSizeFields(self):
-        if dbg: print('CoreDockWidget.updateSizeFields')
+        if dbg: print('gui.CoreDockWidget.updateSizeFields')
         self.mNodesLineEdit.setText(str(self.m))
         self.nNodesLineEdit.setText(str(self.n))
         self.xSizeLineEdit.setText(str(self.xsize))
@@ -150,7 +153,7 @@ class CoreWidget(QtGui.QWidget):
     # GUI
     #===============================================================================
     def hookupUI(self):
-        if dbg: print('CoreDockWidget.hookupUI()')
+        if dbg: print('gui.CoreDockWidget.hookupUI()')
         self.xSizeLineEdit.editingFinished.connect(self.updateSize)
         self.ySizeLineEdit.editingFinished.connect(self.updateSize)
         self.mNodesLineEdit.editingFinished.connect(self.updateSize)
@@ -169,13 +172,13 @@ class CoreWidget(QtGui.QWidget):
         self.reactorComboBox.activated[str].connect(self.reactorComboBoxActivated)
         
     def reactorComboBoxActivated(self,text):
-        if dbg: print('CoreDockWidget.reactorComboBoxActivated')
+        if dbg: print('gui.CoreDockWidget.reactorComboBoxActivated')
         
         
         
         
     def materialComboBoxActivated(self,text):
-        if dbg: print ('CoreDockWidget.materialComboBoxActivated')
+        if dbg: print ('gui.CoreDockWidget.materialComboBoxActivated')
         #Change selection in table to be material
         
         for item in self.coreTable.selectedItems():
@@ -190,7 +193,7 @@ class CoreWidget(QtGui.QWidget):
     def saveCore(self,filename= None):
         
         #Save the core configuration to a file
-        if dbg: print('CoreDockWidget.saveCore()')
+        if dbg: print('gui.CoreDockWidget.saveCore()')
         
         
         allRows = self.coreTable.rowCount()
@@ -331,18 +334,14 @@ def setupMainWindow():
     
 
     
+
 if __name__=='__main__':
-    import numpy as np
-    import matplotlib.pyplot as plt
     
     app = QtGui.QApplication([])
     mainWindow = MainWindow()
     setupMainWindow()
     mainWindow.show()
-    
-    #x = np.linspace(0,7,1000)
-    #f = np.sin(x)
-    #plt.plot(x,f)
+
     app.exec_()
 
  
