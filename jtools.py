@@ -1,7 +1,28 @@
 from numpy import cos,sin,arctan,arccos,sqrt
 import numpy
 from PyQt4.QtGui import QTableWidget
+import glob,os
 
+
+
+#===============================================================================
+# File Stuff
+#===============================================================================
+def currentDirectory():
+    return os.getcwd()
+
+def filesInDirectoryWithExtension(directory,extension):
+    os.chdir(directory)
+    files = []
+    for file in glob.glob(extension):
+        files.append(file)
+    return files
+
+
+
+#===============================================================================
+# PyQt Stuff
+#===============================================================================
 def tableSize(table):
     return table.rowCount(),table.columnCount()
 
@@ -16,6 +37,9 @@ def resizeTableCells(table,size):
     
     return table
 
+#===============================================================================
+# Coordinate Transformations
+#===============================================================================
 def sphericalToCartesian(coord):
     r = coord[0]
     theta=coord[1]
@@ -44,6 +68,9 @@ def rectangularToPolar(coord):
     y= coord[1]
     return [(x*x+y*y)**(0.5),arctan(y/x)]
 
+#===============================================================================
+# Something stupid that I should probably delete and use numpy for
+#===============================================================================
 def magnitude(vector):
     r=0
     for x in vector:

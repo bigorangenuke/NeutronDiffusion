@@ -3,7 +3,7 @@ from PyQt4 import QtGui,QtCore
 import os
 #from mplwidget import MplWidget as mpl
 from PyQt4 import uic
-from jtools import resizeTableCells
+import jtools
 
 dbg = True
 
@@ -14,23 +14,7 @@ DEFAULT_Y_SIZE = 1.
 
 CELL_SIZE = 20
 
-def path_to(file):
-    #return absolute path to file
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)),file)
 
-def layout_widgets(layout):
-    #return iterator of widgets in layout
-    return (layout.itemAt(i) for i in range(layout.count))
-
-def removeWidgetsFromLayout(layout):
-    #deletes all the widgets in layout
-    try:
-        for i in reversed(range(layout.count())):
-            layout.itemAt(i).widget().setParent(None)
-    except:
-        print('gui.removeWidgetsFromLayout() ERROR')
-        return False
-    return True
 
 class CellMaterial():
     def __init__(self):
@@ -180,8 +164,18 @@ class CoreWidget(QtGui.QWidget):
         self.loadCorePushButton.clicked.connect(self.loadCoreButtonIsPressed)
         self.saveCorePushButton.clicked.connect(self.saveCore)
         
+        self.reactorComboBox.addItems(jtools.filesInDirectoryWithExtension(jtools.currentDirectory(), '*.core'))
+        
+        self.reactorComboBox.activated[str].connect(self.reactorComboBoxActivated)
+        
+    def reactorComboBoxActivated(self,text):
+        if dbg: print('CoreDockWidget.reactorComboBoxActivated')
+        
+        
+        
+        
     def materialComboBoxActivated(self,text):
-        print ('CoreDockWidget.materialComboBoxActivated')
+        if dbg: print ('CoreDockWidget.materialComboBoxActivated')
         #Change selection in table to be material
         
         for item in self.coreTable.selectedItems():
@@ -298,7 +292,7 @@ class CoreWidget(QtGui.QWidget):
         layout.addWidget(core)
     
         #Resize and save it
-        self.coreTable = resizeTableCells(core,20)
+        self.coreTable = jtools.resizeTableCells(core,20)
     
     
     def updateCoreButtonIsPressed(self):
@@ -308,7 +302,24 @@ class CoreWidget(QtGui.QWidget):
         self.drawCore(core)
         
 
-        
+
+def path_to(file):
+    #return absolute path to file
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)),file)
+
+def layout_widgets(layout):
+    #return iterator of widgets in layout
+    return (layout.itemAt(i) for i in range(layout.count))
+
+def removeWidgetsFromLayout(layout):
+    #deletes all the widgets in layout
+    try:
+        for i in reversed(range(layout.count())):
+            layout.itemAt(i).widget().setParent(None)
+    except:
+        print('gui.removeWidgetsFromLayout() ERROR')
+        return False
+    return True      
 
 def setupMainWindow():
 
