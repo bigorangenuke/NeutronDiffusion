@@ -14,3 +14,9 @@ To use the generated reactor configuration:
 To decrease the amount of things that are printed, set dbg to false in the modules that are annoying you.
 I labeled where many of the print statements are coming from
 
+
+Code structure:
+	Reactor object: contains Nodes
+	Node object: contains references to its location in the reactor and the material of which it is made
+	Material object: contains the properties of the material
+
