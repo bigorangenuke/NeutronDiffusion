@@ -3,7 +3,7 @@ class Node():
     def __init__(self,i,j,material=None):
         self.i = i
         self.j = j
-        print(material)
+        #print(material)
         self.material = material
         #self.sigma_tr = self.get_sigma_tr()
 #         self.sigma_a = self.get_sigma_a()

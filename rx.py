@@ -2,7 +2,7 @@ import numpy as np
 import material,node
 
 MINIMUM_REACTOR_DIMENSION = 4
-dbg = True
+dbg = False
 
 def fileToReactor(filename):
 	if dbg: print('rx.fileToReactor(%s)'%(filename))
@@ -63,15 +63,16 @@ class Reactor():
 		#Check if a file is passed, otherwise, load a blank pwr code of dimension m x n
 		if 'file' in kwargs:
 			self.loadFileToReactor(kwargs['file'])
-			print('load file stuff')
+			#print('load file stuff')
 		else: self.loadBlankFileToReactor(self.m,self.n)
+
 
 	def loadBlankFileToReactor(self,m,n):
 		#Create a reactor of arbitrary dimension consisting entirely of PWR
 		thenodes = np.empty((self.m,self.n),dtype = object)
 		for i in range(m):
 			for j in range(n):
-				print(i,j)
+				if dbg: print(i,j)
 				thenodes[i,j] = node.Node(i,j,material.Material(1,groups=self.numGroups))
 		self.nodes = thenodes
 
@@ -126,9 +127,11 @@ class Reactor():
 		if g == 2:
 			if dbg: print('Two Group')
 			self.materials.append(material.Material(self.load_file('pwr_2_group.txt')))
+			#self.materials.append(material.Material(self.load_file('h20_2_group.txt')))
 		elif g == 4:
 			if dbg: print('Four Group')
 			self.materials.append(material.Material(self.load_file('pwr_4_group.txt')))
+			#self.materials.append(material.Material(self.load_file('h20_2_group.txt')))
 		else: print('ERROR. No data for %s groups'%(g))
 
 	def oneToTwo(self,index):
@@ -142,12 +145,25 @@ class Reactor():
 		assert(i>=0 and j>=0)
 		return int(i*self.n + j)
 
+
+	#Strip off the edge nodes of reactor matrix
+	def stripEdges(self):
+		return self.nodes[1:-1,1:-1]
+
+	#Set all of the edges to zero
+	def zeroEdges(self):
+		self.nodes[0,:] = 0
+		self.nodes[-1,:] = 0
+		self.nodes[:,0] = 0
+		self.nodes[:,-1] = 0
+		return self.nodes
+
 	def __repr__(self):
 		return "Rx \tNodes = (%s,%s)"%(self.m,self.n)
 
 if __name__=='__main__':
 	reactor = Reactor(groups = 2,file = 'default.core')
-	print(reactor)
+	#print(reactor)
 	#reactor = Reactor(size = [5,5])
 	
 	

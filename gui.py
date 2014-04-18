@@ -5,7 +5,7 @@ import os
 from PyQt4 import uic
 import jtools
 
-dbg = True
+dbg = False
 
 #Default size values for the reactor.
 DEFAULT_M_NODES = 5

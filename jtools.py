@@ -3,7 +3,7 @@ import numpy
 from PyQt4.QtGui import QTableWidget
 import glob,os
 
-
+dbg = False
 
 #===============================================================================
 # File Stuff
