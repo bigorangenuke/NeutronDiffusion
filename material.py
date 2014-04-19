@@ -13,30 +13,37 @@ class Material():
             assert(False)
 
         if material==1:
-            self.name = 'PWR'
-            if dbg: print('Material = PWR')
+            self.name = 'Fuel'
+            if dbg: print('Material = Fuel')
             if groups==2:
-                fn = 'pwr_2_group.txt'
+                fn = 'pwr_2_group_fuel.txt'
             elif groups==4:
-                fn = 'pwr_4_group.txt'
+                fn = 'pwr_4_group_fuel.txt'
         elif material==2:
             self.name = 'Water'
             print('material.Material.__init__ material data for material %s not found'%(material))
-            assert(False)
             if dbg: print('Material = Water')
             if groups==2:
-                fn = 'h20_2_group.txt'
+                fn = 'pwr_2_group_water.txt'
             elif groups==4:
-                fn = 'h20_4_group.txt'
+                fn = 'pwr_4_group_water.txt'
         elif material==3:
-            self.name = 'Graphite'
+            self.name = 'MOX'
             print('material.Material.__init__ material data for material %s not found'%(material))
-            assert(False)
-            if dbg: print('Material = Graphite')
+            if dbg: print('Material = MOX')
             if groups==2:
-                fn = 'graphite_2_group.txt'
+                fn = 'pwr_2_group_MOX.txt'
             elif groups==4:
-                fn = 'graphite_4_group.txt'
+                fn = 'pwr_4_group_MOX.txt'
+        elif material==4:
+            self.name = 'DU'
+            print('material.Material.__init__ material data for material %s not found'%(material))
+            if dbg: print('Material = DU')
+            if groups==2:
+                fn = 'pwr_2_group_nou235.txt'
+            elif groups==4:
+                fn = 'pwr_4_group_nou235.txt'
+            
         else:
             print('Material number %s not recognized'%(material))
             assert(False)

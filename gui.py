@@ -21,11 +21,12 @@ CELL_SIZE = 20
 class CellMaterial():
     #Dictionary of possible cell materials
     def __init__(self):
-        self.materials = {'None': 0,'PWR':1,'Water':2,'Graphite':3}
+        self.materials = {'None': 0,'Fuel':1,'Water':2,'MOX':3,'DU':4}
         self.none = 0
-        self.pwr = self.materials['PWR']
-        self.water= self.materials['Water']
-        self.graphite=self.materials['Graphite']
+        self.fuel   =   self.materials['Fuel']
+        self.water  =   self.materials['Water']
+        self.mox    =   self.materials['MOX']
+        self.du     =   self.materials['DU']
         
 class MainWindow(QtGui.QMainWindow):
     def __init__(self,parent=None):
@@ -84,6 +85,8 @@ class NodeTableWidgetItem(QtGui.QTableWidgetItem):
         elif self.material==2:
             color=  QtGui.QColor(0,0,255)
         elif self.material==3:
+            color = QtGui.QColor(255,128,0)
+        elif self.material==4:
             color = QtGui.QColor(60,60,60)
         brush = QtGui.QBrush(color)
         brush.setStyle(QtCore.Qt.SolidPattern)
