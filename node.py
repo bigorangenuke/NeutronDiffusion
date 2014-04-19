@@ -1,10 +1,11 @@
 
 class Node():
-    def __init__(self,i,j,material=None):
+    def __init__(self,i,j,material=None,value = 0):
         self.i = i
         self.j = j
-        print(material)
+        #print(material)
         self.material = material
+        self.value = 0.
         #self.sigma_tr = self.get_sigma_tr()
 #         self.sigma_a = self.get_sigma_a()
 

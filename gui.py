@@ -5,7 +5,7 @@ import os
 from PyQt4 import uic
 import jtools
 
-dbg = True
+dbg = False
 
 #Default size values for the reactor.
 DEFAULT_M_NODES = 5
@@ -214,6 +214,7 @@ class CoreWidget(QtGui.QWidget):
                 wstr = "%s,%s,%s\n"%(i,j,item.material)
                 f.write(wstr) 
 
+        print(f)
         f.close()
 
     

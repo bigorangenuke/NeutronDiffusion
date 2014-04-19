@@ -2,7 +2,7 @@ from PyQt4 import QtGui
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib import pyplot as plt
-dbg = True
+dbg = False
 forceResize = True
 
 #Represents the matplotlib figure
